@@ -18,3 +18,7 @@ Way 3 : Using Amazon EMR, go to notebook on the Amazon EMR page , create noteboo
 2 Spark streaming demo:
 kafka + Spark Streaming
 ![image](https://github.com/SimonXu100/Big-Data-Spark-Projects/blob/main/Spark%20Streaming%20demo/spark%20streaming%20pipeline.jpeg)
+
+3 Spark GraphX demo
+
+GraphFrames
