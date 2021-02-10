@@ -1,0 +1,31 @@
+bin/zookeeper-server-start.sh config/zookeeper.properties > ./zookeeper-logs &
+bin/kafka-server-start.sh config/server.properties > ./kafka-logs &
+
+
+./bin/kafka-topics.sh --zookeeper ec2-3-94-21-242.compute-1.amazonaws.com:2181 --create --topic heartbeat --partitailtions 2 --replication-factor 1
+
+./bin/kafka-topics.sh --zookeeper ec2-3-94-21-242.compute-1.amazonaws.com:2181 --list
+
+./bin/kafka-topics.sh --zookeeper ec2-3-94-21-242.compute-1.amazonaws.com:2181 --alter --topic heartbeat --config retention.ms=3600000
+
+python3 HeartbeatProducer.py > HeartbeatProducer.log &
+
+./bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic heartbeat --from-beginning
+
+
+./bin/kafka-server-stop.sh
+./bin/zookeeper-server-stop.sh
+
+
+./sbin/start-master.sh
+./sbin/start-slave.sh spark://ip-172-31-7-241.ec2.internal:7077
+./bin/pyspark --master spark://ip-172-31-7-241.ec2.internal:7077
+
+
+./sbin/stop-slave.sh
+./sbin/stop-master.sh
+
+./bin/spark-submit --executor-memory 200M --packages org.apache.spark:spark-streaming-kafka-0-8_2.11:2.0.2 HeartbeatStreaming.py > HeartbeatStreaming.log &
+
+
+tail -f HeartbeatStreaming.log
